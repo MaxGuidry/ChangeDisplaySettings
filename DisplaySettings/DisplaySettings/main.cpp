@@ -10,6 +10,7 @@
 #define _WIN32_WINNT 0x050
 
 LRESULT CALLBACK LowLevelKeyboardProc(int, WPARAM, LPARAM);
+void ListenForKeyCode();
 void MessageLoop();
 bool SearchForElement(int *, int, int);
 static bool TESTING = true;
@@ -54,34 +55,11 @@ int main()
 	dev = new DEVMODE();
 
 	bool opened = false;
-	start = clock();
-	std::thread t(MessageLoop);//,std::ref(GetActiveWindow());
+	//std::thread t(MessageLoop);//,std::ref(GetActiveWindow());
 	bool timeout = false;
 	bool programEnded = false;
-	while (!programEnded)
-	{
-		if (recievedInputRecently)
-		{
-			if (timeout)
-				if ((clock() - start) / CLOCKS_PER_SEC > 2)
-				{
-					recievedInputRecently = false;
-					timeout = false;
-				}
 
-
-
-			if (!timeout)
-				if (SearchForElement(pressed, 0x46, 4) && SearchForElement(pressed, VK_LCONTROL, 4) && SearchForElement(pressed, VK_LMENU, 4) && SearchForElement(pressed, VK_LSHIFT, 4))
-				{
-					ChangeDisplay();
-					timeout = true;
-				}
-
-		}
-
-	}
-
+	MessageLoop();
 	return 0;
 }
 
@@ -102,10 +80,8 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 			if (key->vkCode == 0x46 || key->vkCode == VK_LCONTROL || key->vkCode == VK_LMENU || key->vkCode == VK_LSHIFT)
 			{
 				//ShellExecute(nullptr, "open", "C:\\Program Files (x86)\\Windows Media Player\\wmplayer.exe", nullptr, nullptr, SW_SHOW);
-				if(!recievedInputRecently)
-					start = clock();
-				recievedInputRecently = true;
-				
+
+
 				if (!SearchForElement(&pressed[0], key->vkCode, 4))
 				{
 
@@ -114,6 +90,7 @@ LRESULT CALLBACK LowLevelKeyboardProc(int nCode, WPARAM wParam, LPARAM lParam)
 						if (pressed[i] == '\0')
 						{
 							pressed[i] = key->vkCode;
+							ListenForKeyCode();
 							break;
 						}
 					}
@@ -176,7 +153,7 @@ void MessageLoop()
 void ChangeDisplay()
 {
 	dev->dmSize = sizeof(DEVMODE);
-	dev->dmDriverExtra = 1024;
+	dev->dmDriverExtra = 0;
 	DISPLAY_DEVICE monitor = DISPLAY_DEVICE();
 	monitor.cb = sizeof(monitor);
 	if (EnumDisplayDevices(0, 0, &monitor, EDD_GET_DEVICE_INTERFACE_NAME) == 0)
@@ -191,7 +168,11 @@ void ChangeDisplay()
 	int tmp = dev->dmPelsWidth;
 	dev->dmPelsWidth = dev->dmPelsHeight;
 	dev->dmPelsHeight = tmp;
+
+	std::cout << dev->dmPelsWidth << " , " << dev->dmPelsHeight << "  Mode: " << dev->dmDisplayOrientation << "\n";
 	int result = ChangeDisplaySettingsEx(NULL, dev, NULL, 0, NULL);
+
+
 	//switch (result)
 	//{
 	//case DISP_CHANGE_BADDUALVIEW:
@@ -237,5 +218,30 @@ void ChangeDisplay()
 
 	//}
 	//delete(dev);
+
+}
+
+
+double timeOfLastCall = -1;
+void ListenForKeyCode()
+{
+	double timePassed;
+	if (timeOfLastCall == -1)
+		timePassed = 10;
+	else
+	{
+		timePassed = (clock() - timeOfLastCall) / CLOCKS_PER_SEC;
+	}
+
+	if (timePassed > 2)
+	{
+		if (SearchForElement(pressed, 0x46, 4) && SearchForElement(pressed, VK_LCONTROL, 4) && SearchForElement(pressed, VK_LMENU, 4) && SearchForElement(pressed, VK_LSHIFT, 4))
+		{
+			ChangeDisplay();
+			timeOfLastCall = clock();
+
+		}
+	}
+
 
 }
