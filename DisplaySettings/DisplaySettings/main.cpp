@@ -7,13 +7,11 @@
 
 
 
-#define _WIN32_WINNT 0x050
 
 LRESULT CALLBACK LowLevelKeyboardProc(int, WPARAM, LPARAM);
 void ListenForKeyCode();
 void MessageLoop();
 bool SearchForElement(int *, int, int);
-static bool TESTING = true;
 void ChangeDisplay();
 double start;
 DEVMODE *dev;
@@ -28,37 +26,7 @@ int main()
 	AllocConsole();
 	window = FindWindowA("ConsoleWindowClass", NULL);
 	ShowWindow(window, 0);
-
-
-
-	//std::cout << "----TEST----\n";
-	//TESTING = true;
-	//pressed[0] = VK_LCONTROL;
-	//pressed[1] = VK_LMENU;
-	//pressed[2] = VK_LSHIFT;
-	//pressed[3] = 0x46;
-	//if (SearchForElement(&pressed[0], VK_LCONTROL, 4))
-	//	std::cout << "   Found LCONTROL\n";
-	//if (SearchForElement(pressed, VK_LMENU, 4))
-	//	std::cout << "   Found LALT\n";
-	//if (SearchForElement(pressed, VK_LSHIFT, 4))
-	//	std::cout << "   Found LSHIFT\n";
-	//if (SearchForElement(pressed, 0x46, 4))
-	//	std::cout << "   Found F\n";
-	//for (int i = 0; i < 4; i++)
-	//{
-	//	pressed[i] = '\0';
-	//}
-	//TESTING = false;
-	//std::cout << "----END TEST----";
-
 	dev = new DEVMODE();
-
-	bool opened = false;
-	//std::thread t(MessageLoop);//,std::ref(GetActiveWindow());
-	bool timeout = false;
-	bool programEnded = false;
-
 	MessageLoop();
 	return 0;
 }
@@ -173,51 +141,6 @@ void ChangeDisplay()
 	int result = ChangeDisplaySettingsEx(NULL, dev, NULL, 0, NULL);
 
 
-	//switch (result)
-	//{
-	//case DISP_CHANGE_BADDUALVIEW:
-	//{
-	//	std::cout << "\nBADDUALVIEW\n";
-	//	break;
-	//}
-	//case DISP_CHANGE_BADFLAGS:
-	//{
-	//	std::cout << "\nBADFLAGS\n";
-	//	break;
-	//}
-	//case DISP_CHANGE_BADMODE:
-	//{
-	//	std::cout << "\nBADMODE\n";
-	//	break;
-	//}
-	//case DISP_CHANGE_BADPARAM:
-	//{
-	//	std::cout << "\nBADPARAM\n";
-	//	break;
-	//}
-	//case DISP_CHANGE_FAILED:
-	//{
-	//	std::cout << "\nFAILED\n";
-	//	break;
-	//}
-	//case DISP_CHANGE_NOTUPDATED:
-	//{
-	//	std::cout << "\nNOTUPDATED\n";
-	//	break;
-	//}
-	//case DISP_CHANGE_RESTART:
-	//{
-	//	std::cout << "\nRESTART\n";
-	//	break;
-	//}
-	//case DISP_CHANGE_SUCCESSFUL:
-	//{
-	//	std::cout << "\nSUCCESSFUL\n";
-	//	break;
-	//}
-
-	//}
-	//delete(dev);
 
 }
 
